@@ -6,15 +6,29 @@ router.post('/', (req, res) => {
     res.json({ message: 'I am product' })
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     const id = req.params.id
-    console.log(`Product id is ${id}`)
-    res.json({ message: 'Product id is defined' })
+    const product = await productService.getProductsById(parseInt(id))
+    //console.log(`Product id is ${id}`)
+    res.json({ product: product })
 })
 
-router.get('/', (req, res) => {
-    const products = productService.getProducts()
+router.get('/', async (req, res) => {
+    const products = await productService.getProducts()
     res.header("Access-Control-Allow-Origin")
     res.json({ products: products })
 })
+
+router.post('/:userID/:manufacturerID', async (req, res) => {
+    try {
+        const { userID, manufacturerID } = req.params
+        await productService.insert(userID, parseInt(manufacturerID), req.body)
+        res.json({ message: "In product post" })
+    }
+    catch (err) {
+        res.status(422).json({ message: err });
+    }
+})
+
+
 module.exports = router
